@@ -1,0 +1,176 @@
+/* 1041236157 stack maze ref Datastructure in C by Horowitz */
+#include <stdio.h>
+#include <stdlib.h>
+#define MAXSTACK 100
+#define maxRow 11
+#define maxCol 10
+
+typedef struct {
+    short int row, col, dir;
+} element;
+
+/* the direction which you can move */
+typedef struct {
+    short int vert, horiz;
+} offsets;
+
+/* global */
+int top = -1;
+/*
+int maze[maxRow][maxCol]={{0,1,1,1,1,1,1,1,1,1},
+		          {0,1,1,1,1,1,1,1,1,1},
+		          {0,1,1,1,1,1,1,1,1,1},
+			  {0,1,1,1,1,1,1,1,1,1},
+			  {0,0,1,1,1,1,1,1,1,1},
+			  {1,1,0,1,1,1,1,1,1,1},
+			  {1,1,1,0,1,1,1,1,1,1},
+			  {1,1,1,1,0,1,1,1,1,1},
+			  {1,1,1,1,1,0,1,1,1,1},
+			  {1,1,1,1,1,1,0,1,0,1},	
+			  {1,1,1,1,1,1,1,0,1,0}}; 
+*/			
+int maze[maxRow][maxCol]={{0,1,1,1,1,1,1,1,1,1},
+		          {0,1,1,1,1,1,1,1,1,1},
+		          {0,1,1,1,1,1,1,1,1,1},
+			  {0,1,1,1,1,1,1,1,1,1},
+			  {0,0,0,1,1,1,1,1,1,1},
+			  {1,1,0,1,1,1,1,1,1,1},
+			  {1,1,0,0,0,0,1,1,1,1},
+			  {1,1,1,1,0,1,1,1,1,1},
+			  {1,1,1,1,0,0,0,0,0,1},
+			  {1,1,1,1,1,1,1,1,1,1},
+			  {1,1,1,1,1,1,1,1,1,0}};
+int mark[maxRow][maxCol];
+
+element stack[MAXSTACK];
+offsets move[8] = {{-1,0},{-1,1},{0,1},{1,1},{1,0},{1,-1},{0,-1},{-1,-1}};
+
+/* prototype */
+void push(element item);
+element pop(void);
+void path(int startRow, int startCol, int exitRow, int exitCol);
+
+int main(void)
+{
+    /* set the entrance and exit */
+    /* Eingang und Ausgang       */ 
+    int startRow=0, startCol=0, exitRow=10, exitCol=9;
+
+    /* druck die Landkarte aus */
+    /* print the map           */
+    for(int row =0 ;row < maxRow ;row++) {
+        for(int col = 0 ;col < maxCol ;col++) {
+            printf("%d",maze[row][col]);
+        }
+        puts("\n");
+    }
+    path(startRow, startCol, exitRow, exitCol);
+    return 0;
+}
+
+void push(element item){
+    if (top > MAXSTACK) {
+        puts("pathStack is full\n");
+    }
+    else {
+        stack[++top] = item;
+    }
+}
+element pop(void){
+    if (top > -1 ) {
+	/* take out the position */
+        return stack[top--];
+    }
+    else {
+        puts("pathStack is empyt\n");
+    }
+}
+void path(int startRow, int startCol, int exitRow, int exitCol){
+    /***********************************
+     * row, col : current position     *
+     * dir : direction you will move   *
+     * found : do ya find the exit ?   *
+     **********************************/
+    int row, col, nextRow, nextCol, dir, found = 0, endPoint = 0;  
+    /* int count -> test for all the possiblities of the way out */
+
+    /* stack */
+    element position;
+
+    mark[1][1] = 1; /* search the path from coordinate (1,1) */
+    top = 0;
+
+    /* push the current position into stack[] for marking down */
+    stack[0].row = startRow;
+    stack[0].col = startCol;
+    stack[0].dir = 1; /* the next step to unkown path which you can pass by no poblem */
+
+    while (top > -1 && !found) {
+	/* pop out the position (record at the stack[]) where you are now */
+        position = pop();       /* cppstyle  */
+        row = position.row;
+        col = position.col;
+        dir = position.dir;
+        while (dir < 8) {
+	    /****************************************************************************************************
+            *  try 8 different directions where you stand for searching the path.                               *
+            *  This gives you 3 results										*
+	    *	1. find the way out.									        *
+            *   2. find the path which you can pass by specific dir and never been before			*
+            *   3. the direction among 8 which it's not working so you change the other dir to find the way out *
+	    *****************************************************************************************************/
+	    nextRow = row + move[dir].vert;
+            nextCol = col + move[dir].horiz;
+
+            if (nextRow == exitRow && nextCol == exitCol){
+    		/**********************
+                 *1. Find the way out *
+		 *********************/
+                found = 1;
+		puts("\n");
+                puts("The--Path---is:\n");
+                puts("Row--Col---Dir:\n");
+		/*******************************
+		*  print the trace to the exit *
+		*******************************/
+                for (int trace = 0; trace <= top; trace++)
+                    printf("%2d%5d%5d\n",stack[trace].row, stack[trace].col, stack[trace].dir-1);
+                printf("%2d%5d%5d\n",row,col,dir);
+                printf("%2d%5d%5d\n",exitRow, exitCol, endPoint); 
+                break;
+            }
+            else if ( !maze[nextRow][nextCol] && !mark[nextRow][nextCol]){
+		/**************************************************************
+                * the position of coordinate (nextRow,nextCol) can be pass    *
+		* and ya haven't been (nextRow,nextCol) before                *
+                * die Lage der Koordinate (nextRow,nextCol) durchgehen könnte *
+                * und du bist nicht da durchgegangen                          *
+	        ***************************************************************/
+                
+		
+		//marking down the current position now "I have been here", 
+		//schrieb die aktuelle lage auf dass da ich bin 
+		mark[nextRow][nextCol] = 1; 
+
+                /* push last one position into the position */
+                position.row = row;
+                position.col = col;
+                position.dir = ++dir;  /*to move the next (x,y) */
+                push(position);        /*aufnahmen              */
+
+		//the position you currently are
+                //Die Lage wo du bist 
+		row = nextRow;
+                col = nextCol;
+                dir = 0;
+            }
+	    /**********************************************************************
+	    * one of 8 directions is not working so find the other one             *
+            * eine der Richtungs läuft nicht , ein anderes zwischen 8 herausfinden *
+            ***********************************************************************/
+            else ++dir;
+        }
+    }
+    if(!found)
+        puts("Opppppsss ^__< Cant find the Way Out.\n");
+}
