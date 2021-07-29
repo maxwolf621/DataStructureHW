@@ -5,10 +5,10 @@
 - Hinweis : `Leftmost Child (leftChild) Next Right Sibling (Rightchild)`
 - Algo
     ---
-    ```c
-    1.build up links relationship with Sibling
-        - Using DFS
-    2.delete links btw parent and child of A Tree
+    ```diff
+    - 1.build up links relationship with Sibling
+    +   '--- Using DFS
+    - 2.delete links btw parent and child of A Tree
     ```
 ## Convert Forest to B.T
 - Algo
@@ -19,9 +19,8 @@
     3. Each link(Connecting Sibling) rotate degree 45 clockcounter
     ```
 
-
 ## Copying B.T
-```c=
+```c
 treePtr copy(treePtr orginalTree)
 {
     treePtr temp;
@@ -36,7 +35,7 @@ treePtr copy(treePtr orginalTree)
 ```
 
 ## Test Equality
-```c=
+```c
 int equal(treePtr first, treePtr second)
 {
     return(!first && !second) || 
@@ -63,8 +62,7 @@ That is,it is `replaced by the inorder successor of p`
     - ptr->rightChild == NULL is replaced by a pointer to the node that immediately precedes node p in inorder
     
     
-    
-```c=
+```c
 typedef struct threadTree *threadPtr;
 struct threadTree{
     char data;
@@ -121,7 +119,7 @@ struct set{
 
 - union
   ----
-    ```c=
+    ```c
     // time complexity : O(1)
     Union(i= S1,j = S2)
     {
