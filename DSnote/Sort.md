@@ -2,76 +2,232 @@
 # Sort
 [TOC]
 
+- [Linked List](/RqSYYsdsTECNUEosiA3Qkw)
+
 ## Stable and Unstable(Stabilität und instabilen)
-Es gibt gleiche Schlüssel in einer Datensätz
-Input : 5,4,2,6,`4`,7,1
-Output der Reihenfolgenummer (4 und `4`)
-Stabilität    : 1,2,**4**,`4`,5,6,7
-Instabilität  : 1,2,`4`,**4**,5,6,7
+Es gibt gleiche Schlüssel in einer Datensätz  
+Input : 5,4,2,6,`4`,7,1  
+
+> Abhaengig von dem Reihenfolgenummer (4 und `4`)   
+> 4 is a head of `4`  
+
+- Stabilität    : 1,2,**4**,`4`,5,6,7   
+- Instabilität  : 1,2,`4`,**4**,5,6,7 (`4` is a head of **4**)   
 
 
 ## Insert Sort
+[Reference](http://alrightchiu.github.io/SecondRound/comparison-sort-insertion-sortcha-ru-pai-xu-fa.html)  
+```diff
+- Best Case : O(1) , only compare one time , elements in container are increasing
+
+- Worst Case : O(n), elements in container are decreasing   
+```
+- **當問題的資料量較小時(欲排序的元素之數目較小)，使用Insertion Sort會很有效率**
+  > 因為和Quick Sort、Merge Sort、Heap Sort相比，Insertion Sort不具有「遞迴」形式，因此不需要系統的stack，詳情請參考：
+
+- 有些演算法會在Quick Sort中加入Insertion Sort，讓剩下的「接近完成排序」的資料以Insertion Sort處理，使排序更有效率
 
 
-```c
+```diff
+! Insertion Sort要求，在處理A[i]時，第A[1,i-1]必須先排好序
+```
+![image](https://user-images.githubusercontent.com/68631186/127458715-f2608f45-2d39-4918-9ca8-93aca24172c0.png)
+
+```cpp
+#include <iostream>
 /**
- * @code Insert() 
- * @param temp : a[current]
- * @param left : current - 1 , current的前一個index 
- */
-void insert(int temp, int arr[], int left)
-{
-    /**
-     * a[0] : saving the temp value 
-     */
-    a[0] = temp;  
-    while(temp < a[left])
-    {
-        a[left+1] = a[left] 
-        left--              
+  * @param size : array.size()
+  * @param *arr : array to be sorted
+  */
+void InsertionSort(int *arr, int size){
+    for (int i = 1; i < size; i++) {       
+        /**
+          * key : A unsorted element to be compared with sorted elements
+          * j   : sorted section
+          */
+        int key = arr[i];
+        int j = i - 1;
+        /**
+          * compare {@code key} with {@code arr[j]} 
+          *        {a, b, c, d, c}
+          *  arr[j]-'  '-- key 
+          */
+        while (key < arr[j] && j >= 0) {
+            /**
+              * SHIFT arr[j] backward 
+              */
+            arr[j+1] = arr[j];
+            j--;
+        }
+        /**
+          * put key to the right position
+          */
+        arr[j+1] = key;
     }
-    
-    /** 
-     * when whileloop ends
-     * 1. temp value meets a[0]
-     * 2. temp value is bigger than a[left] 
-     *    so it must put after a[left]
-     */
-     
-     //asign value "temp" to the right position in the array
-    a[left+1] = temp         
 }
 ```
+
 ![](https://i.imgur.com/ukbZnWr.png)
 
 
 ## Select Sort
 
 
+```diff
+arr: 
+     {9, 17, 1, 5, 10}
+min,i-'   '- j
+     {9, 17, 1, 5, 10}
+min,i-'      '-j
+     {9, 17, 1, 5, 10}
+    i-'      '-j, min
+!    /** SWAP(9,1) **/ 
+     {1, 17, 9, 5, 10}
+    i,min-'  '-j 
+     {1, 17, 9, 5, 10}
+       i-'   '-j,min
+     {1, 17, 9, 5, 10}
+       i-'      '-j,min
+     {1, 17, 9, 5, 10}
+       i-'  min-'   '-j
+!    /** SWAP(17,5) **/
+     {1, 5, 9, 17, 10}
+     {1, 5, 9, 17, 10}
+             i-'
+     {1, 5, 9, 10, 17}
+```
+
+```java
+/**
+  * {@code i} : current ptr
+  * {@code j} : next_ptr of current ptr
+  * {@code min} : element that will be compared with j
+  */
+void sort(int arr[])
+    {
+        int n = arr.length;
+ 
+        // One by one move boundary of unsorted subarray
+        for (int i = 0; i < n-1; i++)
+        {
+            // Find the minimum element in unsorted array
+            int min = i;
+            for (int j = i+1; j < n; j++)
+                if (arr[j] < arr[min_idx])
+                    min = j;
+ 
+            // Swap the found minimum element with the first
+            // element
+            int temp = arr[min_idx];
+            arr[min_idx] = arr[i];
+            arr[i] = temp;
+        }
+    }
+```
+
 ## Quick Sort
 ![](https://i.imgur.com/kyMz7e1.png)
-- Best Case : `O(nlogn)`
-- Worst Case : pivot is MAX or MIN => Tree is Skewed O(n<sup>2</sup>) 
+- Divide and Conquer  
+  > `pivot`可以任意挑選
+  > **Divided的Array**則是只是重複相同的步驟(選pivot -> 調整(divide)Array)，利用遞迴(recursion)處理     
+- Unstable
 
-Algo
+```diff
++ Best Case : O(nlogn)
++ Average Case : O(nlogn)
+```
+
+> ![image](https://user-images.githubusercontent.com/68631186/127516920-c469e3c6-d578-4f49-8f66-7af187552e4b.png)
+> ```diff
+> - Worst Case : pivot is MAX or MIN => Tree is Skewed O(n<sup>2</sup>) 
+> ```
+
+### Method 1
+![image](https://user-images.githubusercontent.com/68631186/127509355-5415f995-792c-4b22-8d73-49c9c8af5755.png)
+![image](https://user-images.githubusercontent.com/68631186/127509387-a7f248c7-a97c-400f-b281-7843bcde2ffa.png)
+> ![image](https://user-images.githubusercontent.com/68631186/127509433-dc6ecbb7-26db-47cd-838d-ec94c15b12c7.png)
+```diff
++ a[j] : 9 > pivot : 5
++ move next element : j++
+```
+> ![image](https://user-images.githubusercontent.com/68631186/127509447-93f1abd4-3e6c-4e11-b159-3f312e6cf888.png)
+```diff
++ a[j] ; 4 < pivot : 5
++ do i++ (pointer to element a[1] : 9 )
++ swap(a[i], a[j]) 
++ j points tp next element : j++
+```
+![image](https://user-images.githubusercontent.com/68631186/127509465-e3a6c550-986c-4a0c-8d7f-62186d268a5b.png)
+![image](https://user-images.githubusercontent.com/68631186/127509490-b40225e7-100d-486c-b599-2d4ee70471a7.png)
+![image](https://user-images.githubusercontent.com/68631186/127509508-ba0942f7-2aeb-4b09-a3c9-d3d67cd24aa0.png)
+![image](https://user-images.githubusercontent.com/68631186/127514183-254f63ea-8c1d-41e8-8e30-1507aaf51994.png)
+![image](https://user-images.githubusercontent.com/68631186/127514471-17ffaf5a-9c50-4517-81c5-9ab39a19e9de.png)
+![image](https://user-images.githubusercontent.com/68631186/127514503-a5267db6-3cea-409f-81c6-a8d8dbe555d8.png)
+> ![image](https://user-images.githubusercontent.com/68631186/127514517-770e88c5-5f5e-4c09-83f4-a0c9ae3d78a0.png)
+```diff
+- do parition
+```
+![image](https://user-images.githubusercontent.com/68631186/127514778-dafaefa2-b93b-4510-8f19-8670f7c9536b.png)
+> ![image](https://user-images.githubusercontent.com/68631186/127514793-215bc468-93e2-4068-8bcb-b8fa174e5b05.png)
+```diff
+- (multiprocessor) we can hadle both left and right array at same time via mutiple cpu 
+```
+
+
+```cpp
+/**
+  * {@code Partition}
+  * {@code QuickSort}
+  */
+int Partition(int *arr, int front, int end){
+    int pivot = arr[end];
+    int i = front -1;
+    for (int j = front; j < end; j++) {
+        if (arr[j] < pivot) {
+            i++;
+            swap(&arr[i], &arr[j]);
+        }
+    }
+    
+    i++;
+    swap(&arr[i], &arr[end]);
+    return i;
+}
+
+void QuickSort(int *arr, int front, int end){
+    if (front < end) {
+        /**
+          * {@code pivot} would be 5
+          */
+        int pivot = Partition(arr, front, end);
+        /**
+          * do <strong> divide and conquer </strong>
+          */
+        QuickSort(arr, front, pivot - 1);
+        QuickSort(arr, pivot + 1, end);
+    }
+}
+```
+
+### Method 2 (Howitz)
+
 
 ![](https://i.imgur.com/8U7cpg7.png)
 ![](https://i.imgur.com/aoSsEsK.png)
 ![](https://i.imgur.com/NHbZ6wN.png)
 
+
 ## Merge Sort
+[Reference](http://alrightchiu.github.io/SecondRound/comparison-sort-merge-sorthe-bing-pai-xu-fa.html)
+![](https://i.imgur.com/1uz4cw8.png) 
 
-
-![](https://i.imgur.com/1uz4cw8.png)
-
-
-- function Merge()
+- `Merge()`
     ---
 ![](https://i.imgur.com/X9z6JNj.png)
 
 ![](https://i.imgur.com/dnIWKwl.png)
 
-```c=
+```c
 // do Sorting and Merge 
 void Merge(int List[], int mergeList[], int start, int mid, int end)
 {
