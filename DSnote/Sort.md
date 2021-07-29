@@ -2,7 +2,7 @@
 # Sort
 [TOC]
 
-- [Linked List](/RqSYYsdsTECNUEosiA3Qkw)
+
 
 ## Stable and Unstable(Stabilität und instabilen)
 Es gibt gleiche Schlüssel in einer Datensätz  
@@ -218,88 +218,147 @@ void QuickSort(int *arr, int front, int end){
 
 
 ## Merge Sort
-[Reference](http://alrightchiu.github.io/SecondRound/comparison-sort-merge-sorthe-bing-pai-xu-fa.html)
+
+### Merge (No Recursion)
 ![](https://i.imgur.com/1uz4cw8.png) 
+1. Consider that each element in array as an array that contains only one element `{26},{5},{77},{1},{61},{11},...` for first iteration 
+2. Merge each array that contains only one element like this 
+   > ![](https://i.imgur.com/dnIWKwl.png)
+3. each iteration for each sub-array can be called a run
+   > merge `{26}` with `{5}` we can say Merge two runs `{26}` and `{5}` into one new run `{5,26}`
 
-- `Merge()`
-    ---
-![](https://i.imgur.com/X9z6JNj.png)
-
-![](https://i.imgur.com/dnIWKwl.png)
 
 ```c
-// do Sorting and Merge 
+/**
+ *  Sort Run and Merge Runs into One new Sorted Run
+ */
 void Merge(int List[], int mergeList[], int start, int mid, int end)
 {
-    // to merge sorted List[start:mid] with List[mid+1:end] into mergeList[]
-    int leftsubindex = start     /* for int start   */;
-    int index  = start;       /* for mergeList's index*/;
-    int rightsubindex= mid + 1   /* for rightsubindex of List  */;
-    int rest                      /* rest elements in List[] */;
-    while(leftsub <= end && rightsub <= end )
+    /**
+     *  1. (SORT) Compare List[start:mid] (sub-arrLeft) 
+     *     with List[mid+1:end] (sub-arrRight) 
+     *  2. Merge the right element fetching 
+     *     from sub-arrLeft or sub-arrRight  
+     *     in into mergeList[]
+     */
+    int index  = start;  
+    
+    int leftsubindex = start;     
+    int rightsubindex= mid + 1 ;
+    
+    int rest /* rest elements in sub-array */;
+    
+    while(leftsubindex <= end && rightsubindex <= end )
     {
+        /**
+         * Compate Left sub-array with Right sub-array
+         * put the small one into mergList 
+         */
         if(List[leftsubindex] <= List[rightsubindex]) 
-            mergeList[index++] = Leist[leftsubindex];
+            mergeList[index++] = List[leftsubindex];
         else
             mergeList[index++] = List[rightsubindex];
     }
-    if ( leftsubindex > mid)
+    
+    // Rests 
+    if ( leftsubindex > mid) 
         for(rest = rightsubindex ; rest <= end ; rest++) 
             mergeList[index++] = List[rest];
     else
         for(rest = leftsubindex ; rest <= mid ; rest++)
-        mergeList[inde++] = List[lefsubindex]
+            mergeList[inde++] = List[lefsubindex];
 }
 ```
 
 
-- function MergePass()
-    ----
-- Was funktioniert MergPass()
-![](https://i.imgur.com/5ZYzrLu.png)
+#### Merge Each Pass 
+> Wie funktioniert MergPass()  
+> ![](https://i.imgur.com/5ZYzrLu.png)  
 
-```c=
-// Pairing 
+**Pass** means iterate the runs 
+- For each pass it will do multiple time `merge` method.
+For example 
+```diff
+- For First Pass,We know each run's size(lenSec = 1) is one 
+- And we start a iteration via a ptr to list[1](current = 1)
+- so we got mid = 10 - 2 * 1 + 1 = 9
+- {26},{5},{77},{1},{61},{11},{59},{15},{48},{19}
+                                          '-mid
++ 1. call Merge method 
++ 2. call Merge method {77},{1} start from element {77}   
++ 3. call Merge method {61},{11} starting from element {61}
++ 4. call Merge method {59},{15} starting from element {59}
+```
+![](https://i.imgur.com/WzqgmWf.png)
+
+
+```c
+/**
+ * <p> Merge adjacent pairs of sorted segments(sub-arrays)
+ *     From {@code List[]} to sorted {@cpde mergeList[]} </p>
+ * <p> lenSec : the size of each SORTED array for this pass, e.g. merge {5,26} with {1,77} => lenSec = 2 </p>
+ * <p> lenList: len of {@code list[]} </p>
+ */
 void mergePass(element List[], element mergeList[], int lenList, int lenSec)
-// lenSec : the size of each SORTED segment ex: to stort {1,2} => s = 2
-// lenList :  len of list[]
-// Merge its adjacent pairs of sorted segments from List[] to mergeList[]
 
-int current ;    /* start from List[current] */
-int rest    ;    /* rest elements  */
-int midList = lenList - 2*lenSec + 1 ;    /* middle of List[] */
+/**
+ * {@code current} : first element of first array
+ * {@code rest}  : rest element that haven't been merged 
+ * {@code midList} 
+ *     middle element of {@code List[]}
+ *     For first Pass 
+ *     lenList : 1 
+ *     lenSec : 1 (one run) {26},{5},{77},{1},{61},{11}
+ *     mid : 1 - 2 + 1 = 0       
+ */
+int current ;    
+int rest    ;    
+int middle = lenList - 2*lenSec + 1 ;    
                     
-// one Pass pair two Section (Each Section has length of 2 )
-// Iterative Pass i= 1        :  {5,26} {1,77}   
-// Iterative Pass i = 1 + 2*2 :  {11,61} {14,59}
-for(current=1; current<= midList; current+=2*lenSec)  
+/**
+ * Each Pass merges sub-array in pairs (Each Section has length of 2 )
+ * e.g.
+ * Iterative Pass i= 1        :  {5,26} ,{1,77}, ... , ....
+ * Iterative Pass i = 1 + 2*2 :  {1,5,26,77} , {11,61} {14,59}
+ */
+for(current=1; current<= middle; current+=2*lenSec)  
     /**********************************************************
-     * Assume lenSec = 2 
-     * {x1,x2} {x3,x4}  
-     * ---- position of x4 would be 2*len - 1
-     * -----position of mid in {x1,x2,x3,x4} would be  i + len
-     * -----Think : warum (lenSec) -1 muss
+     * Assume lenSec = 2 則要merge {x1,x2} with {x3,x4}  
+     *  -> index of (end)x4 would be [2*lenSec - 1]
+     *  -> index of mid in {x1,x2,x3,x4} 
+     *     would be [current + lenSec - 1]
+     * Think : warum (lenSec) -1 muss
      **********************************************************/
     int mid = current + lenSec   -1;
     int end = current + 2*lenSec -1;
-    Merge(List,mergeList, i, mid, end);
-if (current+lenSec-1 < n) 
-    // there are no others can pair 
-    // as {19,48}
-    merge(List,mergeList,current,current+lenSec,lenList);
-else// rest elements
+    Merge(List, mergeList, current, mid, end);
+if ( mid < n) 
+    Merge(List,mergeList,current,current+lenSec,lenList);
+else// there are no others can pair e.g. sub-array {19,48}
     for(rest = current ; rest <= lenList ; rest++ )
         mergeList[rest] = List[rest] ;
 ```
-- mergeSort()
-  ---
-- wie functioniert mergeSort
-![](https://i.imgur.com/mtFP5JT.png)
+
+#### mergeSort
+> wie functioniert mergeSort  
+> ![](https://i.imgur.com/mtFP5JT.png)  
 
 ```c=
 void mergeSort(element List, int lenList)
-// Iterative
 {
+    /**
+     * Do Iteration (Pass)
+     * Pass = 1 -> merge each sub-array 
+     *             whose size == 1 in pair
+     * Pass = 2 -> merge each sub-array 
+     *             whose size == 2 in pair
+     * Pass = 3 -> merge each sub-array
+     *             whose size == 4 in pair
+     * Pass = 4 -> merge each sub-array 
+     *             whose size == 8 in pair
+     * If there are no pairs existing 
+     * Then merge rest sub-array
+     */
     element mergeList[MaxSize];
     int lenSec = 1            ; // iterative 1 , 2 , 4 , 8 
     for( lenSec ; lenSec < lenList ; lenSec*=2 )
@@ -311,6 +370,48 @@ void mergeSort(element List, int lenList)
 }
 ```
 
+
+### Method 2
+[Reference](http://alrightchiu.github.io/SecondRound/comparison-sort-merge-sorthe-bing-pai-xu-fa.html)
+```cpp
+const int Max = 1000;
+
+void Merge(std::vector<int> &Array, int front, int mid, int end){
+
+    // 利用 std::vector 的constructor, 
+    // 把array[front]~array[mid]放進 LeftSub[]
+    // 把array[mid+1]~array[end]放進 RightSub[]
+    std::vector<int> LeftSub(Array.begin()+front, Array.begin()+mid+1),
+                     RightSub(Array.begin()+mid+1, Array.begin()+end+1);
+
+    LeftSub.insert(LeftSub.end(), Max);      // 在LeftSub[]尾端加入值為 Max 的元素
+    RightSub.insert(RightSub.end(), Max);    // 在RightSub[]尾端加入值為 Max 的元素
+
+    int idxLeft = 0, idxRight = 0;
+
+    for (int i = front; i <= end; i++) {
+
+        if (LeftSub[idxLeft] <= RightSub[idxRight] ) {
+            Array[i] = LeftSub[idxLeft];
+            idxLeft++;
+        }
+        else{
+            Array[i] = RightSub[idxRight];
+            idxRight++;
+        }
+    }
+}
+
+void MergeSort(std::vector<int> &array, int front, int end){
+                                         // front與end為矩陣範圍
+    if (front < end) {                   // 表示目前的矩陣範圍是有效的
+        int mid = (front+end)/2;         // mid即是將矩陣對半分的index
+        MergeSort(array, front, mid);    // 繼續divide矩陣的前半段subarray
+        MergeSort(array, mid+1, end);    // 繼續divide矩陣的後半段subarray
+        Merge(array, front, mid, end);   // 將兩個subarray做比較, 並合併出排序後的矩陣
+    }
+}
+```
 ## Radix Sort
 
 - 分成
