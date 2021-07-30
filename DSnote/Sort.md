@@ -19,17 +19,16 @@ Input : 5,4,2,6,`4`,7,1
 [Reference](http://alrightchiu.github.io/SecondRound/comparison-sort-insertion-sortcha-ru-pai-xu-fa.html)  
 ```diff
 - Best Case : O(1) , only compare one time , elements in container are increasing
-
 - Worst Case : O(n), elements in container are decreasing   
 ```
 - **當問題的資料量較小時(欲排序的元素之數目較小)，使用Insertion Sort會很有效率**
   > 因為和Quick Sort、Merge Sort、Heap Sort相比，Insertion Sort不具有「遞迴」形式，因此不需要系統的stack，詳情請參考：
 
-- 有些演算法會在Quick Sort中加入Insertion Sort，讓剩下的「接近完成排序」的資料以Insertion Sort處理，使排序更有效率
+- **有些演算法會在Quick Sort中加入Insertion Sort，讓剩下的「接近完成排序」的資料以Insertion Sort處理，使排序更有效率**
 
 
 ```diff
-! Insertion Sort要求，在處理A[i]時，第A[1,i-1]必須先排好序
+! Insertion Sort要求，在處理A[i](`key`)時，第A[1,i-1](`A[j]`)必須先排好序
 ```
 ![image](https://user-images.githubusercontent.com/68631186/127458715-f2608f45-2d39-4918-9ca8-93aca24172c0.png)
 
@@ -39,24 +38,24 @@ Input : 5,4,2,6,`4`,7,1
   * @param size : array.size()
   * @param *arr : array to be sorted
   */
-void InsertionSort(int *arr, int size){
+void InsertionSort(int *A, int size){
     for (int i = 1; i < size; i++) {       
         /**
           * key : A unsorted element to be compared with sorted elements
           * j   : sorted section
           */
-        int key = arr[i];
+        int key = A[i];
         int j = i - 1;
         /**
-          * compare {@code key} with {@code arr[j]} 
-          *        {a, b, c, d, c}
-          *  arr[j]-'  '-- key 
+          * Compare {@code key} with {@code arr[j]} 
+          *   {a, b, c, d, c}
+          *  j-'  '-- key 
           */
-        while (key < arr[j] && j >= 0) {
+        while (key < A[j] && j >= 0) {
             /**
-              * SHIFT arr[j] backward 
+              * SHIFT A[j] backward 
               */
-            arr[j+1] = arr[j];
+            A[j+1] = A[j];
             j--;
         }
         /**
@@ -68,29 +67,35 @@ void InsertionSort(int *arr, int size){
 ```
 
 ![](https://i.imgur.com/ukbZnWr.png)
+```diff
+key 5,4,3,2,1
 
+- while(key<A[j] && j >= 0)
+    key(4) 5(j), 4(key), 3, 2, 1
+- SHIFT A[j] backward, 
+    key(4) 5, 5, 3, 2, 1
+- A[j+1] = key
+    key(4) 4,5,3,2,1
+```
 
 ## Select Sort
-
-
 ```diff
-arr: 
-     {9, 17, 1, 5, 10}
+!-warning-! arr: {9, 17, 1, 5, 10}
 min,i-'   '- j
      {9, 17, 1, 5, 10}
 min,i-'      '-j
      {9, 17, 1, 5, 10}
-    i-'      '-j, min
-!    /** SWAP(9,1) **/ 
+-   i-'      '-j, min
+!    ---SWAP(9,1)----- 
      {1, 17, 9, 5, 10}
-    i,min-'  '-j 
+-   i,min-'  '-j 
      {1, 17, 9, 5, 10}
-       i-'   '-j,min
+-      i-'   '-j,min
      {1, 17, 9, 5, 10}
        i-'      '-j,min
      {1, 17, 9, 5, 10}
        i-'  min-'   '-j
-!    /** SWAP(17,5) **/
+!    ---SWAP(17,5)----
      {1, 5, 9, 17, 10}
      {1, 5, 9, 17, 10}
              i-'
@@ -139,46 +144,46 @@ void sort(int arr[])
 
 > ![image](https://user-images.githubusercontent.com/68631186/127516920-c469e3c6-d578-4f49-8f66-7af187552e4b.png)
 > ```diff
-> - Worst Case : pivot is MAX or MIN => Tree is Skewed O(n<sup>2</sup>) 
+> - Worst Case : pivot is MAX or MIN 
+>    '-Tree is Skewed 
+>    '-O(n^2) 
 > ```
 
 ### Method 1
 ![image](https://user-images.githubusercontent.com/68631186/127509355-5415f995-792c-4b22-8d73-49c9c8af5755.png)
 ![image](https://user-images.githubusercontent.com/68631186/127509387-a7f248c7-a97c-400f-b281-7843bcde2ffa.png)
 > ![image](https://user-images.githubusercontent.com/68631186/127509433-dc6ecbb7-26db-47cd-838d-ec94c15b12c7.png)
-```diff
-+ a[j] : 9 > pivot : 5
-+ move next element : j++
-```
+>```diff
+>+ a[j] : 9 > pivot : 5
+>+ move next element : j++
+>```
+
 > ![image](https://user-images.githubusercontent.com/68631186/127509447-93f1abd4-3e6c-4e11-b159-3f312e6cf888.png)
-```diff
-+ a[j] ; 4 < pivot : 5
-+ do i++ (pointer to element a[1] : 9 )
-+ swap(a[i], a[j]) 
-+ j points tp next element : j++
-```
+>```diff
+>+ a[j] ; 4 < pivot : 5
+>+ do i++ (pointer to element a[1] : 9 )
+>+ swap(a[i], a[j]) 
+>+ j points to next element : j++
+>```
 ![image](https://user-images.githubusercontent.com/68631186/127509465-e3a6c550-986c-4a0c-8d7f-62186d268a5b.png)
 ![image](https://user-images.githubusercontent.com/68631186/127509490-b40225e7-100d-486c-b599-2d4ee70471a7.png)
 ![image](https://user-images.githubusercontent.com/68631186/127509508-ba0942f7-2aeb-4b09-a3c9-d3d67cd24aa0.png)
 ![image](https://user-images.githubusercontent.com/68631186/127514183-254f63ea-8c1d-41e8-8e30-1507aaf51994.png)
 ![image](https://user-images.githubusercontent.com/68631186/127514471-17ffaf5a-9c50-4517-81c5-9ab39a19e9de.png)
 ![image](https://user-images.githubusercontent.com/68631186/127514503-a5267db6-3cea-409f-81c6-a8d8dbe555d8.png)
-> ![image](https://user-images.githubusercontent.com/68631186/127514517-770e88c5-5f5e-4c09-83f4-a0c9ae3d78a0.png)
-```diff
-- do parition
-```
-![image](https://user-images.githubusercontent.com/68631186/127514778-dafaefa2-b93b-4510-8f19-8670f7c9536b.png)
+![image](https://user-images.githubusercontent.com/68631186/127514517-770e88c5-5f5e-4c09-83f4-a0c9ae3d78a0.png)
+>![image](https://user-images.githubusercontent.com/68631186/127514778-dafaefa2-b93b-4510-8f19-8670f7c9536b.png)
+>```diff
+>- do Partition
+>```
+
+
 > ![image](https://user-images.githubusercontent.com/68631186/127514793-215bc468-93e2-4068-8bcb-b8fa174e5b05.png)
-```diff
-- (multiprocessor) we can hadle both left and right array at same time via mutiple cpu 
-```
-
-
+>```diff
+> - (multiprocessor) 
+> +  we can handle both left and right array at same time via multiple CPUs
+>```
 ```cpp
-/**
-  * {@code Partition}
-  * {@code QuickSort}
-  */
 int Partition(int *arr, int front, int end){
     int pivot = arr[end];
     int i = front -1;
@@ -209,13 +214,15 @@ void QuickSort(int *arr, int front, int end){
 }
 ```
 
-### Method 2 (Howitz)
+### Method 2 (horowitz)
 
 
 ![](https://i.imgur.com/8U7cpg7.png)
 ![](https://i.imgur.com/aoSsEsK.png)
-![](https://i.imgur.com/NHbZ6wN.png)
-
+> ![](https://i.imgur.com/NHbZ6wN.png)
+> ```dif
+> - if we have only one CPU then process partition and quicksort one by one
+> ```
 
 ## Merge Sort
 
