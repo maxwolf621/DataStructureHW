@@ -1,9 +1,6 @@
 ###### tags: `Data Structure`
 # Sort
 [TOC]
-
-
-
 ## Stable and Unstable(Stabilität und instabilen)
 Es gibt gleiche Schlüssel in einer Datensätz  
 Input : 5,4,2,6,`4`,7,1  
@@ -15,7 +12,36 @@ Input : 5,4,2,6,`4`,7,1
 - Instabilität  : 1,2,`4`,**4**,5,6,7 (`4` is a head of **4**)   
 
 
-## Insert Sort
+## Bubble Sort
+
+[Reference](https://www.bookstack.cn/read/algorithm-exercise-tw/basics_sorting-bubble_sort.md)   
+
+![bubble_sort.gif](https://github.com/maxwolf621/DataStructureHW/blob/f0a08100a761fa5bd1a7533fd81e81e9cb2c1fc7/DSnote/GIF/bubble_sort.gif)   
+
+```diff
+Array : 5 4 3 2 1
+Iteration : Array.lenth - 1 = 4 , each element compare with Array[0]
+
++ i = 0  
+-  4 5 3 2 1
+-  4 3 5 2 1
+-  4 3 2 5 1
+  4 3 2 1 5 
++ i = 1  
+-  3 4 2 1 5
+-  3 2 4 1 5
+-  3 2 1 4 5
+  3 2 1 4 5
++ i = 2
+-  2 3 1 4 5
+-  2 1 3 4 5
+  2 1 3 4 5
++ i = 3 
+-  1 2 3 4 5
+  1 2 3 4 5
+```
+
+## Insertion Sort
 [Reference](http://alrightchiu.github.io/SecondRound/comparison-sort-insertion-sortcha-ru-pai-xu-fa.html)  
 ```diff
 - Best Case : O(1) , only compare one time , elements in container are increasing
@@ -220,7 +246,7 @@ void QuickSort(int *arr, int front, int end){
 ![](https://i.imgur.com/8U7cpg7.png)
 ![](https://i.imgur.com/aoSsEsK.png)
 > ![](https://i.imgur.com/NHbZ6wN.png)
-> ```dif
+> ```diff
 > - if we have only one CPU then process partition and quicksort one by one
 > ```
 
@@ -229,10 +255,11 @@ void QuickSort(int *arr, int front, int end){
 ### Merge (No Recursion)
 ![](https://i.imgur.com/1uz4cw8.png) 
 1. Consider that each element in array as an array that contains only one element `{26},{5},{77},{1},{61},{11},...` for first iteration 
-2. Merge each array that contains only one element like this 
-   > ![](https://i.imgur.com/dnIWKwl.png)
-3. each iteration for each sub-array can be called a run
-   > merge `{26}` with `{5}` we can say Merge two runs `{26}` and `{5}` into one new run `{5,26}`
+2. Merge each array that contains only one element  
+   > ![](https://i.imgur.com/dnIWKwl.png)  
+3. Each iteration for each sub-array can be called a **run**  
+   > For example merge `{26}` with `{5}` we can say Merge two runs `{26}` and `{5}` into one new run `{5,26}`  
+4. Repeat the steps
 
 
 ```c
@@ -276,7 +303,6 @@ void Merge(int List[], int mergeList[], int start, int mid, int end)
             mergeList[inde++] = List[lefsubindex];
 }
 ```
-
 
 #### Merge Each Pass 
 > Wie funktioniert MergPass()  
@@ -350,7 +376,7 @@ else// there are no others can pair e.g. sub-array {19,48}
 > wie functioniert mergeSort  
 > ![](https://i.imgur.com/mtFP5JT.png)  
 
-```c=
+```c
 void mergeSort(element List, int lenList)
 {
     /**
@@ -427,13 +453,13 @@ void MergeSort(std::vector<int> &array, int front, int end){
 
 
 ### Decker Sort 
-K<sup>1</sup> : :clubs: < :diamonds: < :hearts: < :spades:
-K<sup>2</sup> : 2 < 3 < 4 < 5 < 6 <7 < 8 < 9 < 10 < J < Q < K < A 
+K<sup>1</sup> : :clubs: < :diamonds: < :hearts: < :spades:   
+K<sup>2</sup> : 2 < 3 < 4 < 5 < 6 <7 < 8 < 9 < 10 < J < Q < K < A   
 
 - Sorting Using Bin Sorting
     ---
-    1.sort K<sup>1</sup>分成四桶（四花色）
-    2.sort L<sup>2</sup> after
+    1.sort K<sup>1</sup>分成四桶（四花色）  
+    2.sort L<sup>2</sup> after  
 
 ```c
 // a[] : input dataset from range a[1: end]
@@ -489,7 +515,7 @@ for(i=d-1 ; i >= ; i++){
 
 ![](https://i.imgur.com/wXoWj2r.png)
 
-- It's A Complete B.T. 
+- A Complete B.T. 
 - Every Node has its own sequence.
 
 The number above a node is the corresponding index in the array. Above and below the array are lines showing parent-child relationships; 
@@ -498,14 +524,11 @@ The tree has height three;
 the node at index 4 (with value 8) has height one.
 
 
-```
+```diff
 Following the Complete Tree rule
-- Parent(i)
-return [i/2]
-- LeftNode(i)
-return [2i]
-- RightNode(i)
-return [2i+1]
+- Parent(i) return [i/2]
+- LeftNode(i) return [2i]
+- RightNode(i) return [2i+1]
 ```
 
 There are two kinds of binary heap.
@@ -553,7 +576,7 @@ Using MAX_HEAPIFY() in a bottom-up manner to convert an Array A[1...n], where n 
 
 The Elements in the subarray A[([n/2]+1)...n] are all leves of the tree
 
-```python=
+```python
 def BUILD_MAX_HEAP(A)
     heapsize = A.length
     for i = [A.length/2] downto 1
@@ -570,7 +593,7 @@ def BUILD_MAX_HEAP(A)
 2. decrementing Array length 
 3. find Max heap(by function of MAX_HEAPIFY) in the decreamented Array
 
-```python=
+```python
 def heapSort(Array A)
     for i = A.length downto 2
         swap A[1] with A[i] #swap the last node with Root
@@ -581,7 +604,7 @@ def heapSort(Array A)
 ![](https://i.imgur.com/WEVgdTH.png)
 ### Insertion
 ![](https://i.imgur.com/UMZwaXM.png)
-```c=
+```c
 #define maxElement 100;
 #define heapFull(n) (n == maxElement-1)
 #define heapEmpty(n) (!n)
@@ -621,7 +644,7 @@ void push(element item, int *n /* pointer to &A[n] */)
 
 ### Deletion(the Root)
 
-```c=
+```c
 element pop(int *n /* &Array[n]*/)
 {
     int parent, child ; // index of Array 
