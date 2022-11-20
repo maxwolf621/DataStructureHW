@@ -1,26 +1,53 @@
-###### tags: `Data Structure`
 # Sort
-[TOC]
+
+
+- [Sort](#sort)
+  - [Stable and Unstable(Stabilität und instabilen)](#stable-and-unstablestabilität-und-instabilen)
+  - [Bubble Sort](#bubble-sort)
+  - [Insertion Sort](#insertion-sort)
+    - [Algorithm](#algorithm)
+  - [Select Sort](#select-sort)
+    - [Algorithm](#algorithm-1)
+  - [Quick Sort](#quick-sort)
+    - [Method 1](#method-1)
+      - [Partition Algo](#partition-algo)
+      - [QuickSort Algo](#quicksort-algo)
+    - [Method 2 (horowitz)](#method-2-horowitz)
+  - [Merge Sort](#merge-sort)
+    - [Iteration](#iteration)
+      - [Merge Method For Each Merge Pass](#merge-method-for-each-merge-pass)
+      - [mergePass() Merge Each Pass](#mergepass-merge-each-pass)
+      - [mergeSort](#mergesort)
+    - [Recursion](#recursion)
+  - [Radix Sort / bucket sort](#radix-sort--bucket-sort)
+    - [Decker Sort (Bin Sorting)](#decker-sort-bin-sorting)
+    - [LSD](#lsd)
+    - [MSD](#msd)
+  - [Heap](#heap)
+    - [Procedures](#procedures)
+    - [Maintaining the heap Property](#maintaining-the-heap-property)
+    - [HeapSort](#heapsort)
+    - [Insertion](#insertion)
+    - [Deletion(the Root)](#deletionthe-root)
+  - [Stable and Unstable](#stable-and-unstable)
+
+
 ## Stable and Unstable(Stabilität und instabilen)
 Es gibt gleiche Schlüssel in einer Datensätz  
+
+```java
 Input : 5,4,2,6,`4`,7,1  
-
-> Abhaengig von dem Reihenfolgenummer (4 und `4`)   
-> 4 is a head of `4`  
-
-- Stabilität    : 1,2,**4**,`4`,5,6,7   
-- Instabilität  : 1,2,`4`,**4**,5,6,7 (`4` is a head of **4**)   
-
+```
+Abhaengig von dem Reihenfolgenummer (4 und `4`)   
+- Stabilität    : 1,2,4,`4`,5,6,7   
+- Instabilität  : 1,2,`4`,4,5,6,7 (`4` is a head of 4)   
 
 ## Bubble Sort
 
-[Reference](https://www.bookstack.cn/read/algorithm-exercise-tw/basics_sorting-bubble_sort.md)   
-
-![bubble_sort.gif](https://github.com/maxwolf621/DataStructureHW/blob/f0a08100a761fa5bd1a7533fd81e81e9cb2c1fc7/DSnote/GIF/bubble_sort.gif)   
 
 ```diff
 Array : 5 4 3 2 1
-Iteration : Array.lenth - 1 = 4 , each element compare with Array[0]
+Iteration : Array.length - 1 = 4 , each element compare with Array[0]
 
 + i = 0  
 -  4 5 3 2 1
@@ -43,20 +70,36 @@ Iteration : Array.lenth - 1 = 4 , each element compare with Array[0]
 
 ## Insertion Sort
 [Reference](http://alrightchiu.github.io/SecondRound/comparison-sort-insertion-sortcha-ru-pai-xu-fa.html)  
-```diff
-- Best Case : O(1) , only compare one time , elements in container are increasing
-- Worst Case : O(n), elements in container are decreasing   
+
+Best Case
+- `O(1)` , **only compare one time** , elements in container are increasing  
+  (e.g. `1,2,3,5,4`)
+
+worst Case
+- `O(n)`, elements in container are decreasing 
+  (e.g. `5,4,3,2,1`)
+
+
+**當問題的資料量較小時(欲排序的元素之數目較小)，使用Insertion Sort會很有效率**
+  因為和Quick Sort、Merge Sort、Heap Sort相比，Insertion Sort不具有「遞迴」形式，因此不需要系統的stack
+
+**有些演算法會在Quick Sort中加入Insertion Sort，讓剩下的「接近完成排序」的資料以Insertion Sort處理，使排序更有效率**
+
+
+### Algorithm
+
+```java
+    + key
+    '
+4 5 3 2 1
+    |
+sort|unsorted
 ```
-- **當問題的資料量較小時(欲排序的元素之數目較小)，使用Insertion Sort會很有效率**
-  > 因為和Quick Sort、Merge Sort、Heap Sort相比，Insertion Sort不具有「遞迴」形式，因此不需要系統的stack，詳情請參考：
-
-- **有些演算法會在Quick Sort中加入Insertion Sort，讓剩下的「接近完成排序」的資料以Insertion Sort處理，使排序更有效率**
-
-
-```diff
-! Insertion Sort要求，在處理A[i](`key`)時，第A[1,i-1](`A[j]`)必須先排好序
-```
-![image](https://user-images.githubusercontent.com/68631186/127458715-f2608f45-2d39-4918-9ca8-93aca24172c0.png)
+- key值 : Iteration所指向的值(`Array[i]`)
+- key會跟`Array[j]`做比較，j指向的值都是Sorted好的Element 
+  - `4`跟`5`，`j`會Iterate的Element
+- 當key值比某個Array[j]小進行Shift
+- Each Iteration i, key(`Array[i]`)都會被SORTED到對的位置
 
 ```cpp
 #include <iostream>
@@ -65,48 +108,55 @@ Iteration : Array.lenth - 1 = 4 , each element compare with Array[0]
   * @param *arr : array to be sorted
   */
 void InsertionSort(int *A, int size){
-    for (int i = 1; i < size; i++) {       
-        /**
-          * key : A unsorted element to be compared with sorted elements
-          * j   : sorted section
-          */
+    for (int i = 1; i < size; i++) {  
+
+        // ASSIGN k and j
+        // j k 
+        // 5 4 3 2 1 
         int key = A[i];
         int j = i - 1;
-        /**
-          * Compare {@code key} with {@code arr[j]} 
-          *   {a, b, c, d, c}
-          *  j-'  '-- key 
-          */
+        
+        // SHIFT sorted element backward ->
+        // if Array[j] bigger than key
         while (key < A[j] && j >= 0) {
-            /**
-              * SHIFT A[j] backward 
-              */
+
+            // j 
+            // 5 5 3 2 1  (shifting 5 4 to 5 5)
             A[j+1] = A[j];
             j--;
         }
-        /**
-          * put key to the right position
-          */
+        
+        
+        // PLACE key at right position
+        // 4 5 3 2 1 
         arr[j+1] = key;
     }
 }
+
+    k
+4 5 3 2 1  //ASSIGN k and j
+4 5 5 2 1  // SHIFT j-- 
+4 4 5 2 1  // SHIFT j--
+3 4 5 2 1  //PLACE a key to right position
+
+       k
+3 4 5j 2 1   
+3 4 5j 5 1  // SHIFT j--
+3 4j 4 5 1  // SHIFT j-- 
+3j3 4 5 1   // SHIFT j--
+2 3 4 5 1   // PLACE KEY  
+
+.. so on
 ```
 
-![](https://i.imgur.com/ukbZnWr.png)
-```diff
-key 5,4,3,2,1
 
-- while(key<A[j] && j >= 0)
-    key(4) 5(j), 4(key), 3, 2, 1
-- SHIFT A[j] backward, 
-    key(4) 5, 5, 3, 2, 1
-- A[j+1] = key
-    key(4) 4,5,3,2,1
-```
 
 ## Select Sort
-```diff
-!-warning-! arr: {9, 17, 1, 5, 10}
+
+### Algorithm
+
+```java
+     {9, 17, 1, 5, 10}
 min,i-'   '- j
      {9, 17, 1, 5, 10}
 min,i-'      '-j
@@ -127,7 +177,6 @@ min,i-'      '-j
              i-'
      {1, 5, 9, 10, 17}
 ```
-
 ```java
 /**
   * {@code i} : current ptr
@@ -137,7 +186,7 @@ min,i-'      '-j
 void sort(int arr[])
     {
         int n = arr.length;
- 
+
         // One by one move boundary of unsorted subarray
         for (int i = 0; i < n-1; i++)
         {
@@ -158,39 +207,53 @@ void sort(int arr[])
 
 ## Quick Sort
 ![](https://i.imgur.com/kyMz7e1.png)
-- Divide and Conquer  
-  > `pivot`可以任意挑選
-  > **Divided的Array**則是只是重複相同的步驟(選pivot -> 調整(divide)Array)，利用遞迴(recursion)處理     
+
+特性
+- Divide and Conquer
+  - `pivot`可以任意挑選
+  - **Divided的Array**則是只是重複相同的步驟(選pivot -> 調整(divide)Array)，利用遞迴(recursion)處理     
 - Unstable
 
-```diff
-+ Best Case : O(nlogn)
-+ Average Case : O(nlogn)
-```
+Best Case : `O(nlogn)`   
+Average Case : `O(nlogn)`   
+Worst Case : `O(n^2)`, pivot is MAX or MIN **(Tree is Skewed)**
+- ![image](https://user-images.githubusercontent.com/68631186/127516920-c469e3c6-d578-4f49-8f66-7af187552e4b.png)
 
-> ![image](https://user-images.githubusercontent.com/68631186/127516920-c469e3c6-d578-4f49-8f66-7af187552e4b.png)
-> ```diff
-> - Worst Case : pivot is MAX or MIN 
->    '-Tree is Skewed 
->    '-O(n^2) 
-> ```
 
 ### Method 1
-![image](https://user-images.githubusercontent.com/68631186/127509355-5415f995-792c-4b22-8d73-49c9c8af5755.png)
-![image](https://user-images.githubusercontent.com/68631186/127509387-a7f248c7-a97c-400f-b281-7843bcde2ffa.png)
-> ![image](https://user-images.githubusercontent.com/68631186/127509433-dc6ecbb7-26db-47cd-838d-ec94c15b12c7.png)
->```diff
->+ a[j] : 9 > pivot : 5
->+ move next element : j++
->```
 
-> ![image](https://user-images.githubusercontent.com/68631186/127509447-93f1abd4-3e6c-4e11-b159-3f312e6cf888.png)
->```diff
->+ a[j] ; 4 < pivot : 5
->+ do i++ (pointer to element a[1] : 9 )
->+ swap(a[i], a[j]) 
->+ j points to next element : j++
->```
+```java
+  front           end
+i j-------------j pivot
+  9 5 1 6 7 3 8 2 5
+```
+
+![image](https://user-images.githubusercontent.com/68631186/127509355-5415f995-792c-4b22-8d73-49c9c8af5755.png)
+
+#### Partition Algo
+
+```java
+int Partition(int *arr, int front, int end){
+
+    int pivot = arr[end]; // pivot refs to end of array
+    int i = front -1;     
+    
+    // iterate each j to compare with pivot
+    // swap means put the one that smaller than pivot
+    // to its left side
+    for (int j = front; j < end; j++) {
+        if (arr[j] < pivot) {
+            i++;
+            swap(&arr[i], &arr[j]);
+        }
+    }
+    i++;
+    swap(&arr[i], &arr[end]);
+    return i;
+}
+```
+![image](https://user-images.githubusercontent.com/68631186/127509433-dc6ecbb7-26db-47cd-838d-ec94c15b12c7.png)
+![image](https://user-images.githubusercontent.com/68631186/127509447-93f1abd4-3e6c-4e11-b159-3f312e6cf888.png)
 ![image](https://user-images.githubusercontent.com/68631186/127509465-e3a6c550-986c-4a0c-8d7f-62186d268a5b.png)
 ![image](https://user-images.githubusercontent.com/68631186/127509490-b40225e7-100d-486c-b599-2d4ee70471a7.png)
 ![image](https://user-images.githubusercontent.com/68631186/127509508-ba0942f7-2aeb-4b09-a3c9-d3d67cd24aa0.png)
@@ -198,61 +261,38 @@ void sort(int arr[])
 ![image](https://user-images.githubusercontent.com/68631186/127514471-17ffaf5a-9c50-4517-81c5-9ab39a19e9de.png)
 ![image](https://user-images.githubusercontent.com/68631186/127514503-a5267db6-3cea-409f-81c6-a8d8dbe555d8.png)
 ![image](https://user-images.githubusercontent.com/68631186/127514517-770e88c5-5f5e-4c09-83f4-a0c9ae3d78a0.png)
->![image](https://user-images.githubusercontent.com/68631186/127514778-dafaefa2-b93b-4510-8f19-8670f7c9536b.png)
->```diff
->- do Partition
->```
 
 
-> ![image](https://user-images.githubusercontent.com/68631186/127514793-215bc468-93e2-4068-8bcb-b8fa174e5b05.png)
->```diff
-> - (multiprocessor) 
-> +  we can handle both left and right array at same time via multiple CPUs
->```
+#### QuickSort Algo
+
 ```cpp
-int Partition(int *arr, int front, int end){
-    int pivot = arr[end];
-    int i = front -1;
-    for (int j = front; j < end; j++) {
-        if (arr[j] < pivot) {
-            i++;
-            swap(&arr[i], &arr[j]);
-        }
-    }
-    
-    i++;
-    swap(&arr[i], &arr[end]);
-    return i;
-}
-
 void QuickSort(int *arr, int front, int end){
     if (front < end) {
-        /**
-          * {@code pivot} would be 5
-          */
         int pivot = Partition(arr, front, end);
-        /**
-          * do <strong> divide and conquer </strong>
-          */
+        
+        // <strong> divide and conquer
         QuickSort(arr, front, pivot - 1);
         QuickSort(arr, pivot + 1, end);
     }
 }
 ```
+![image](https://user-images.githubusercontent.com/68631186/127514793-215bc468-93e2-4068-8bcb-b8fa174e5b05.png)
+- (multiprocessor) we can handle both left and right array at same time via multiple CPUs
+
 
 ### Method 2 (horowitz)
-
 
 ![](https://i.imgur.com/8U7cpg7.png)
 ![](https://i.imgur.com/aoSsEsK.png)
 > ![](https://i.imgur.com/NHbZ6wN.png)
-> ```diff
-> - if we have only one CPU then process partition and quicksort one by one
-> ```
+- if we have only one CPU then process partition and quicksort one by one
+
 
 ## Merge Sort
 
-### Merge (No Recursion)
+### Iteration
+
+#### Merge Method For Each Merge Pass
 ![](https://i.imgur.com/1uz4cw8.png) 
 1. Consider that each element in array as an array that contains only one element `{26},{5},{77},{1},{61},{11},...` for first iteration 
 2. Merge each array that contains only one element  
@@ -304,17 +344,19 @@ void Merge(int List[], int mergeList[], int start, int mid, int end)
 }
 ```
 
-#### Merge Each Pass 
-> Wie funktioniert MergPass()  
-> ![](https://i.imgur.com/5ZYzrLu.png)  
+#### mergePass() Merge Each Pass 
+
+![](https://i.imgur.com/5ZYzrLu.png)  
 
 **Pass** means iterate the runs 
-- For each pass it will do multiple time `merge` method.
-For example 
-```diff
+
+For each pass it will do multiple time `merge` method.
+
 - For First Pass,We know each run's size(lenSec = 1) is one 
 - And we start a iteration via a ptr to list[1](current = 1)
 - so we got mid = 10 - 2 * 1 + 1 = 9
+
+```bash
 - {26},{5},{77},{1},{61},{11},{59},{15},{48},{19}
                                           '-mid
 + 1. call Merge method 
@@ -328,7 +370,7 @@ For example
 ```c
 /**
  * <p> Merge adjacent pairs of sorted segments(sub-arrays)
- *     From {@code List[]} to sorted {@cpde mergeList[]} </p>
+ *     From {@code List[]} to sorted {@code mergeList[]} </p>
  * <p> lenSec : the size of each SORTED array for this pass, e.g. merge {5,26} with {1,77} => lenSec = 2 </p>
  * <p> lenList: len of {@code list[]} </p>
  */
@@ -373,8 +415,8 @@ else// there are no others can pair e.g. sub-array {19,48}
 ```
 
 #### mergeSort
-> wie functioniert mergeSort  
-> ![](https://i.imgur.com/mtFP5JT.png)  
+
+![](https://i.imgur.com/mtFP5JT.png)  
 
 ```c
 void mergeSort(element List, int lenList)
@@ -404,7 +446,8 @@ void mergeSort(element List, int lenList)
 ```
 
 
-### Method 2
+### Recursion
+
 [Reference](http://alrightchiu.github.io/SecondRound/comparison-sort-merge-sorthe-bing-pai-xu-fa.html)
 ```cpp
 const int Max = 1000;
@@ -445,21 +488,19 @@ void MergeSort(std::vector<int> &array, int front, int end){
     }
 }
 ```
-## Radix Sort
+## Radix Sort / bucket sort
 
-- 分成
-    - Most Significant Digit First Sorting
-    - Least Significant Digit First Sorting 
+- 種類
+  Most Significant Digit First Sorting   
+  Least Significant Digit First Sorting   
 
+### Decker Sort (Bin Sorting)
 
-### Decker Sort 
-K<sup>1</sup> : :clubs: < :diamonds: < :hearts: < :spades:   
-K<sup>2</sup> : 2 < 3 < 4 < 5 < 6 <7 < 8 < 9 < 10 < J < Q < K < A   
-
-- Sorting Using Bin Sorting
-    ---
-    1.sort K<sup>1</sup>分成四桶（四花色）  
-    2.sort L<sup>2</sup> after  
+   
+1. sort K<sup>1</sup> 分成 4 BINS（四花色）    
+   K<sup>1</sup> : :clubs: < :diamonds: < :hearts: < :spades:
+2. sort L<sup>2</sup>     
+   K<sup>2</sup> : 2 < 3 < 4 < 5 < 6 <7 < 8 < 9 < 10 < J < Q < K < A   
 
 ```c
 // a[] : input dataset from range a[1: end]
@@ -513,56 +554,58 @@ for(i=d-1 ; i >= ; i++){
 
 ## Heap
 
-![](https://i.imgur.com/wXoWj2r.png)
 
+![](https://i.imgur.com/wXoWj2r.png)
+- Heap sort is an in-place algorithm. 
 - A Complete B.T. 
 - Every Node has its own sequence.
 
-The number above a node is the corresponding index in the array. Above and below the array are lines showing parent-child relationships; 
+The number above a node is the corresponding index in the array. 
+
+Above and below the array are lines showing parent-child relationships; 
 parents are always to the left of their children. 
+
 The tree has height three; 
 the node at index 4 (with value 8) has height one.
 
-
-```diff
 Following the Complete Tree rule
-- Parent(i) return [i/2]
-- LeftNode(i) return [2i]
-- RightNode(i) return [2i+1]
+```bash
+Parent(i) return [i/2]  
+LeftNode(i) return [2i]   
+RightNode(i) return [2i+1]   
 ```
 
-There are two kinds of binary heap.
-In both Kinds,the values in the nodes statisfy a `heap property`
-1. max-Heaps (maxNode is at Root) : ${A[parent]\ge A[i]}$ 
-2. min-heaps (minNode is at Root) : ${A[parent]\le A[i]}$
+### Procedures
 
 ![](https://i.imgur.com/d1d6JDS.png)
 
-
 ### Maintaining the heap Property
 
-- Function MAX_HEAPIFY 
-    It's inputs are an Array A and an index i (parent node) into the array.
+Heap Property 
+1. max-Heaps (maxNode is located at Root) : `A[parent]> A[i]}`
+2. min-heaps (minNode is located at Root) : `A[parent]< A[i]}`
 
 ```c
 MAX_HEAPIFY(A,parent)
 {
-// lets the value at A[parent] **float down** in the max-heap so that the subtree rooted at index i obeys the max-heap property
-
     l = LEFT(parent); // left child of node i
     r = RIGHT(parent); // right child of node i 
-    
-   /************************************
-    *COMPARE WITH LEFT CHILD of I FIRST* 
-    ************************************/
-    if(l <= A.length && A[l] > A[parent]) // compare left child
+
+    /**
+      * Parent compares with its children 
+      * To Find Biggest
+      */
+    if(l <= A.length && A[l] > A[parent]) 
+    // compare with left child
         largest = l                   ; 
-    else largest = i                  ;   
-    if(r <= A.length && A[r] > A[parent]) // compare right child
-        larget = r                    ;
-    if largest != i                   ;
+    else largest = parent             ;   
+    if(r <= A.length && A[r] > A[parent]) 
+    // compare with right child
+        largest = r                   ;
+    if largest != parent              ;  
+    // max-Heaps parent always bigger than its child
         swap(A[parent],A[largest])    ;
-        MAX_HEAPIFY(A,largest)        ;   // keep comparing child's child
+        MAX_HEAPIFY(A,largest)        ;  // compare each node who has children
     
 }
 ```
@@ -570,38 +613,38 @@ MAX_HEAPIFY(A,parent)
 ![](https://i.imgur.com/A5EzqpX.png)
 
 
-- Building a heap
-  ---
-Using MAX_HEAPIFY() in a bottom-up manner to convert an Array A[1...n], where n = A.length, into a max heap
+### Build max heap
 
-The Elements in the subarray A[([n/2]+1)...n] are all leves of the tree
-
+The Elements in the Sub Array `A[([n/2]+1)...n]` are all Leaf of the tree
 ```python
 def BUILD_MAX_HEAP(A)
     heapsize = A.length
-    for i = [A.length/2] downto 1
+    for i = [A.length/2] DownTo 1
         MAX_HEAPIFY(A,i) #Compare each parent of a node (bottom-up)
 ```
-
+- Using `MAX_HEAPIFY` in a bottom-up manner to convert an `Array A[1...n]`, where `n = A.length`, into a max heap
 
 ![](https://i.imgur.com/o5pmSAj.png)
 
 
-- HeapSort
-   ----
-    1. swap the root (coz it's max) with last node (coz it's min)
-2. decrementing Array length 
-3. find Max heap(by function of MAX_HEAPIFY) in the decreamented Array
+### HeapSort
+
+1. swap the root (coz it's max) with last node (coz it's min)
+1. decrementing Array length 
+2. find Max heap(`MAX_HEAPIFY`) in the descend Array
 
 ```python
 def heapSort(Array A)
     for i = A.length downto 2
         swap A[1] with A[i] #swap the last node with Root
         A.heapSize = A.heapSize - 1 
-        MAX_HEAPIFY(A,1) # kepp the property of maxHeap
+        MAX_HEAPIFY(A,1) # keep the property of maxHeap
 ```
 
+
+
 ![](https://i.imgur.com/WEVgdTH.png)
+
 ### Insertion
 ![](https://i.imgur.com/UMZwaXM.png)
 ```c
@@ -612,7 +655,7 @@ def heapSort(Array A)
 typedef struct{
     int key
 }element
-elment heap[maxElement];
+element heap[maxElement];
 int n = 0;
 
 // add the new item at position [last node + 1]
